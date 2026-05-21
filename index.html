@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Search - Kurs Simulasi</title>
+    <title>Google Search - Kurs Simulation</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #171717;
-            --google-gray: #202124;
+            --surface: #202124;
             --text-main: #e8eaed;
             --text-sub: #bdc1c6;
             --border: #3c4043;
@@ -21,94 +21,108 @@
             color: var(--text-main);
             font-family: 'Roboto', sans-serif;
             margin: 0; padding: 0;
-            overflow-x: hidden;
         }
 
-        .top-nav {
-            padding: 15px 15px 5px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: sticky;
-            top: 0;
+        /* HEADER AREA */
+        .header {
             background: var(--bg-dark);
-            z-index: 10;
+            padding: 15px 15px 0 15px;
+            position: sticky; top: 0; z-index: 100;
         }
-
-        .search-row { display: flex; align-items: center; justify-content: space-between; }
-
-        .search-bar {
-            background: #303134;
-            flex-grow: 1;
-            margin: 0 10px;
-            height: 45px;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
+        .search-bar-wrap {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 15px;
         }
-
-        .search-bar input {
+        .search-box {
+            background: #303134; flex: 1; margin: 0 12px;
+            height: 44px; border-radius: 22px; display: flex;
+            align-items: center; padding: 0 15px;
+        }
+        .search-box input {
             background: transparent; border: none; color: white;
             font-size: 16px; width: 100%; outline: none;
         }
-
-        .profile-icon {
-            width: 32px; height: 32px; background-color: #00acc1;
-            color: white; border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; font-weight: 500;
+        .profile-e {
+            width: 32px; height: 32px; background: #00acc1;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: 500; font-size: 14px;
         }
 
-        .tabs { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tabs span { color: var(--text-sub); font-size: 14px; white-space: nowrap; }
-        .tabs .active { color: var(--text-main); border-bottom: 3px solid var(--blue); padding-bottom: 8px; }
-
-        .content { padding: 20px 15px; }
-        .info-header { color: var(--text-sub); font-size: 14px; margin-bottom: 5px; }
-
-        .rate-main {
-            font-size: 36px;
-            font-weight: 400;
-            margin: 5px 0;
+        .tabs-scroll {
+            display: flex; gap: 20px; overflow-x: auto;
+            scrollbar-width: none; border-bottom: 1px solid var(--border);
         }
-        .rate-main span { font-size: 20px; }
+        .tabs-scroll::-webkit-scrollbar { display: none; }
+        .tabs-scroll span {
+            font-size: 14px; color: var(--text-sub); padding-bottom: 10px; white-space: nowrap;
+        }
+        .tabs-scroll .active { color: var(--blue); border-bottom: 3px solid var(--blue); }
 
-        .location { font-size: 24px; margin-top: 10px; }
-        .date-info { color: var(--text-sub); font-size: 12px; margin: 5px 0 20px 0; }
+        /* CONTENT CARD */
+        .card { padding: 20px 15px; border-bottom: 8px solid #000; }
+        .price-title { color: var(--text-sub); font-size: 14px; margin-bottom: 8px; }
+        .price-big { font-size: 40px; font-weight: 400; margin: 0; }
+        .price-big span { font-size: 22px; }
+        .location-text { font-size: 22px; margin: 8px 0; }
+        .disclaimer { font-size: 12px; color: var(--text-sub); margin-bottom: 20px; }
 
-        .range-selector { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
-        .range-selector span { font-size: 12px; color: var(--text-sub); padding: 4px 8px; }
-        .range-selector .active-range { background: #3c4043; color: white; border-radius: 12px; }
+        .chart-box { height: 180px; margin-bottom: 25px; }
 
-        .chart-wrap { height: 180px; margin: 20px 0; }
-
-        .input-group {
-            border: 1px solid var(--border);
-            border-radius: 8px; padding: 12px; margin-bottom: 8px;
+        .input-row {
             display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 12px; margin-bottom: 10px;
         }
-        .input-group input { background: transparent; border: none; color: white; font-size: 18px; width: 50%; outline: none; }
-        .input-group select { background: transparent; border: none; color: var(--text-sub); font-size: 14px; outline: none; width: 45%; text-align: right; }
+        .input-row input { background: transparent; border: none; color: white; font-size: 18px; width: 50%; outline: none; }
+        .input-row .label { color: var(--text-sub); font-size: 14px; text-align: right; width: 50%; }
 
-        .btn-container { display: flex; gap: 10px; margin-top: 20px; }
-        .sim-btn {
+        /* BUTTONS SIMULATION */
+        .btn-sim { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-sim div {
             flex: 1; background: #303134; border: 1px solid var(--border);
-            color: var(--blue); padding: 14px; border-radius: 24px;
-            text-align: center; font-size: 14px; font-weight: 500; cursor: pointer;
+            color: var(--blue); text-align: center; padding: 12px;
+            border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer;
         }
-        .sim-btn:active { background: #424345; }
+
+        /* SECTION: ORANG LAIN JUGA BERTANYA (FAQ) */
+        .section-title { font-size: 18px; padding: 20px 15px 10px; }
+        .faq-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; border-bottom: 1px solid var(--border);
+        }
+        .faq-item span { font-size: 14px; }
+
+        /* SECTION: WEBSITE LIST (SERP) */
+        .site-result { padding: 20px 15px; border-bottom: 1px solid var(--border); }
+        .site-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        
+        /* Gaya untuk gambar/favicon situs */
+        .favicon-img { 
+            width: 26px; height: 26px; 
+            border-radius: 50%; 
+            background: #303134;
+            object-fit: cover;
+        }
+
+        .site-name { font-size: 12px; color: var(--text-sub); }
+        .site-title { color: var(--blue); font-size: 18px; text-decoration: none; display: block; margin-bottom: 5px; }
+        .site-desc { font-size: 14px; color: var(--text-sub); line-height: 1.4; }
+
+        /* FOOTER */
+        .footer { padding: 30px 15px; color: var(--text-sub); font-size: 12px; text-align: center; background: #171717; }
     </style>
 </head>
 <body>
 
-<div class="top-nav">
-    <div class="search-row">
-        <svg focusable="false" viewBox="0 0 24 24" width="24" height="24" fill="#9aa0a6"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
-        <div class="search-bar"><input type="text" value="1 dolar berapa rupiah"></div>
-        <div class="profile-icon">E</div>
+<div class="header">
+    <div class="search-bar-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <div class="search-box">
+            <input type="text" value="1 dolar berapa rupiah">
+        </div>
+        <div class="profile-e">E</div>
     </div>
-    <div class="tabs">
+    <div class="tabs-scroll">
         <span class="active">Semua</span>
         <span>Keuangan</span>
         <span>Berita</span>
@@ -117,48 +131,75 @@
     </div>
 </div>
 
-<div class="content">
-    <div class="info-header">1 Dolar Amerika Serikat sama dengan</div>
-    <div class="rate-main"><strong id="bigPrice">17.670,00</strong> <span>Rupiah</span></div>
-    <div class="location">Indonesia</div>
-    <div class="date-info" id="currentDate">21 Mei, 14.02 UTC · Disclaimer</div>
+<div class="card">
+    <div class="price-title">1 Dolar Amerika Serikat sama dengan</div>
+    <div class="price-big"><strong id="mainPrice">17.670,00</strong> <span>Rupiah Indonesia</span></div>
+    <div class="location-text">Indonesia</div>
+    <div class="disclaimer">21 Mei, 08.11 UTC · Morningstar · Penafian</div>
 
-    <div class="range-selector">
-        <span>1HR</span><span>5HR</span><span class="active-range">1BLN</span><span>1TH</span><span>5TH</span><span>Maks</span>
-    </div>
+    <div class="chart-box"><canvas id="myChart"></canvas></div>
 
-    <div class="chart-wrap"><canvas id="myChart"></canvas></div>
-
-    <div class="input-group">
+    <div class="input-row">
         <input type="text" value="1" readonly>
-        <select disabled><option>Dolar Amerika Serikat</option></select>
+        <div class="label">Dolar Amerika Serikat ▾</div>
     </div>
-    <div class="input-group">
-        <input type="text" id="idrVal" value="17.670" readonly>
-        <select disabled><option>Rupiah Indonesia</option></select>
+    <div class="input-row">
+        <input type="text" id="idrVal" value="17.670,00" readonly>
+        <div class="label">Rupiah Indonesia ▾</div>
     </div>
 
-    <div class="btn-container">
-        <div class="sim-btn" onclick="updatePrice(-100)">Perkuat</div>
-        <div class="sim-btn" onclick="updatePrice(100)">Perlemah</div>
+    <div class="btn-sim">
+        <div onclick="updateKurs(-100)">Perkuat</div>
+        <div onclick="updateKurs(100)">Perlemah</div>
     </div>
 </div>
 
-<script>
-    let rate = 17670;
-    let prices = [17150, 17300, 17200, 17450, 17350, 17600, 17670];
-    
-    // Set Tanggal Otomatis
-    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', options) + " UTC · Data simulasi";
+<div class="section-title">Orang lain juga bertanya</div>
+<div class="faq-item"><span>1 dolar ke rupiahnya berapa?</span> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9aa0a6" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></div>
 
+<div class="site-result">
+    <div class="site-meta">
+        <img src="logo-wise.png" class="favicon-img" alt="Wise"> 
+        <span class="site-name">Wise</span>
+    </div>
+    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://wise.com/id/currency-converter/usd-to-idr-rate%3Famount%3D1&ved=2ahUKEwj879nz98mUAxUj1jgGHYYUFNgQFnoECD4QAQ&sqi=2&usg=AOvVaw1dayBJfUlsiLxOiIxlN5F5" class="site-title">Nilai Tukar 1 dolar AS ke rupiah Indonesia. Konversi USD/IDR</a>
+    <div class="site-desc">Konversi 1 USD ke IDR dengan Kalkulator Kurs Wise. Analisis grafik mata uang historis...</div>
+</div>
+
+<div class="site-result">
+    <div class="site-meta">
+        <img src="logo-tradingeconomics.png" class="favicon-img" alt="TE">
+        <span class="site-name">Trading Economics</span>
+    </div>
+    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://id.tradingeconomics.com/usdidr:cur&ved=2ahUKEwj879nz98mUAxUj1jgGHYYUFNgQFnoECEAQAQ&sqi=2&usg=AOvVaw1Rf_tFQfPthy6A3JqkJguh" class="site-title">USDIDR US Dollar Indonesian Rupiah - Grafik Harga Langsung</a>
+    <div class="site-desc">USDIDR US Dollar Indonesian Rupiah Harga Langsung Kurs Pertukaran Mata Uang...</div>
+</div>
+
+<div class="site-result">
+    <div class="site-meta">
+        <img src="logo-bi.png" class="favicon-img" alt="BI">
+        <span class="site-name">Bank Indonesia</span>
+    </div>
+    <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.bi.go.id/id/statistik/informasi-kurs/transaksi-bi/kalkulator-kurs.aspx&ved=2ahUKEwj879nz98mUAxUj1jgGHYYUFNgQFnoECD8QAQ&sqi=2&usg=AOvVaw0q6nuqhOEKu8wP-w5i3N4q" class="site-title">Kalkulator Kurs - Bank Indonesia</a>
+    <div class="site-desc">Gunakan kalkulator kurs Bank Indonesia untuk mendapatkan nilai tukar akurat dan terbaru...</div>
+</div>
+
+<div class="footer">
+    Indonesia <br><br>
+    <span style="color:#8ab4f8">Setelan - Bantuan - Masukan</span>
+</div>
+
+<script>
+    let currentRate = 17670.00;
+    let historyData = [17150, 17300, 17200, 17400, 17350, 17600, 17670];
+    
     const ctx = document.getElementById('myChart').getContext('2d');
     let chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: ['', '', '', '', '', '', ''],
             datasets: [{
-                data: prices,
+                data: historyData,
                 borderColor: '#81c995',
                 borderWidth: 2,
                 pointRadius: 0,
@@ -171,40 +212,21 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { grid: { color: '#3c4043' }, ticks: { display: false } }
-            }
+            scales: { x: { display: false }, y: { grid: { color: '#3c4043' }, ticks: { display: false } } }
         }
     });
 
-    function updatePrice(change) {
-        rate += change;
-        
-        // Batasan logika
-        if (rate < 1) rate = 1;
-        if (rate > 100000000000) rate = 100000000000;
-
-        // Format angka (ID-ID)
-        let formatted = new Intl.NumberFormat('id-ID', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(rate);
-
-        // Update Tampilan
-        document.getElementById('bigPrice').innerText = formatted;
-        document.getElementById('idrVal').value = formatted.split(',')[0];
-
-        // Update Chart
-        prices.shift();
-        prices.push(rate);
-        
-        // Ubah warna berdasarkan tren
-        const isStrengthening = change < 0;
-        chart.data.datasets[0].borderColor = isStrengthening ? '#81c995' : '#f28b82';
-        chart.data.datasets[0].backgroundColor = isStrengthening ? 'rgba(129, 201, 149, 0.1)' : 'rgba(242, 139, 130, 0.1)';
-        
-        chart.update('none'); // Update tanpa animasi berlebih agar terasa snappier
+    function updateKurs(change) {
+        currentRate += change;
+        if (currentRate < 1) currentRate = 1;
+        let fmt = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2 }).format(currentRate);
+        document.getElementById('mainPrice').innerText = fmt;
+        document.getElementById('idrVal').value = fmt;
+        historyData.shift();
+        historyData.push(currentRate);
+        chart.data.datasets[0].borderColor = (change < 0) ? '#81c995' : '#f28b82';
+        chart.data.datasets[0].backgroundColor = (change < 0) ? 'rgba(129, 201, 149, 0.1)' : 'rgba(242, 139, 130, 0.1)';
+        chart.update();
     }
 </script>
 
