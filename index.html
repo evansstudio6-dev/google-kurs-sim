@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Search - Kurs Simulasi</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #171717;
+            --google-gray: #202124;
+            --text-main: #e8eaed;
+            --text-sub: #bdc1c6;
+            --border: #3c4043;
+            --blue: #8ab4f8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+
+        .top-nav {
+            padding: 15px 15px 5px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-dark);
+            z-index: 10;
+        }
+
+        .search-row { display: flex; align-items: center; justify-content: space-between; }
+
+        .search-bar {
+            background: #303134;
+            flex-grow: 1;
+            margin: 0 10px;
+            height: 45px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .search-bar input {
+            background: transparent; border: none; color: white;
+            font-size: 16px; width: 100%; outline: none;
+        }
+
+        .profile-icon {
+            width: 32px; height: 32px; background-color: #00acc1;
+            color: white; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: 500;
+        }
+
+        .tabs { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tabs span { color: var(--text-sub); font-size: 14px; white-space: nowrap; }
+        .tabs .active { color: var(--text-main); border-bottom: 3px solid var(--blue); padding-bottom: 8px; }
+
+        .content { padding: 20px 15px; }
+        .info-header { color: var(--text-sub); font-size: 14px; margin-bottom: 5px; }
+
+        .rate-main {
+            font-size: 36px;
+            font-weight: 400;
+            margin: 5px 0;
+        }
+        .rate-main span { font-size: 20px; }
+
+        .location { font-size: 24px; margin-top: 10px; }
+        .date-info { color: var(--text-sub); font-size: 12px; margin: 5px 0 20px 0; }
+
+        .range-selector { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .range-selector span { font-size: 12px; color: var(--text-sub); padding: 4px 8px; }
+        .range-selector .active-range { background: #3c4043; color: white; border-radius: 12px; }
+
+        .chart-wrap { height: 180px; margin: 20px 0; }
+
+        .input-group {
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .input-group input { background: transparent; border: none; color: white; font-size: 18px; width: 50%; outline: none; }
+        .input-group select { background: transparent; border: none; color: var(--text-sub); font-size: 14px; outline: none; width: 45%; text-align: right; }
+
+        .btn-container { display: flex; gap: 10px; margin-top: 20px; }
+        .sim-btn {
+            flex: 1; background: #303134; border: 1px solid var(--border);
+            color: var(--blue); padding: 14px; border-radius: 24px;
+            text-align: center; font-size: 14px; font-weight: 500; cursor: pointer;
+        }
+        .sim-btn:active { background: #424345; }
+    </style>
+</head>
+<body>
+
+<div class="top-nav">
+    <div class="search-row">
+        <svg focusable="false" viewBox="0 0 24 24" width="24" height="24" fill="#9aa0a6"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
+        <div class="search-bar"><input type="text" value="1 dolar berapa rupiah"></div>
+        <div class="profile-icon">E</div>
+    </div>
+    <div class="tabs">
+        <span class="active">Semua</span>
+        <span>Keuangan</span>
+        <span>Berita</span>
+        <span>Gambar</span>
+        <span>Video</span>
+    </div>
+</div>
+
+<div class="content">
+    <div class="info-header">1 Dolar Amerika Serikat sama dengan</div>
+    <div class="rate-main"><strong id="bigPrice">17.670,00</strong> <span>Rupiah</span></div>
+    <div class="location">Indonesia</div>
+    <div class="date-info" id="currentDate">21 Mei, 14.02 UTC · Disclaimer</div>
+
+    <div class="range-selector">
+        <span>1HR</span><span>5HR</span><span class="active-range">1BLN</span><span>1TH</span><span>5TH</span><span>Maks</span>
+    </div>
+
+    <div class="chart-wrap"><canvas id="myChart"></canvas></div>
+
+    <div class="input-group">
+        <input type="text" value="1" readonly>
+        <select disabled><option>Dolar Amerika Serikat</option></select>
+    </div>
+    <div class="input-group">
+        <input type="text" id="idrVal" value="17.670" readonly>
+        <select disabled><option>Rupiah Indonesia</option></select>
+    </div>
+
+    <div class="btn-container">
+        <div class="sim-btn" onclick="updatePrice(-100)">Perkuat</div>
+        <div class="sim-btn" onclick="updatePrice(100)">Perlemah</div>
+    </div>
+</div>
+
+<script>
+    let rate = 17670;
+    let prices = [17150, 17300, 17200, 17450, 17350, 17600, 17670];
+    
+    // Set Tanggal Otomatis
+    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', options) + " UTC · Data simulasi";
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    let chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['', '', '', '', '', '', ''],
+            datasets: [{
+                data: prices,
+                borderColor: '#81c995',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.3,
+                fill: true,
+                backgroundColor: 'rgba(129, 201, 149, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: { grid: { color: '#3c4043' }, ticks: { display: false } }
+            }
+        }
+    });
+
+    function updatePrice(change) {
+        rate += change;
+        
+        // Batasan logika
+        if (rate < 1) rate = 1;
+        if (rate > 100000000000) rate = 100000000000;
+
+        // Format angka (ID-ID)
+        let formatted = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(rate);
+
+        // Update Tampilan
+        document.getElementById('bigPrice').innerText = formatted;
+        document.getElementById('idrVal').value = formatted.split(',')[0];
+
+        // Update Chart
+        prices.shift();
+        prices.push(rate);
+        
+        // Ubah warna berdasarkan tren
+        const isStrengthening = change < 0;
+        chart.data.datasets[0].borderColor = isStrengthening ? '#81c995' : '#f28b82';
+        chart.data.datasets[0].backgroundColor = isStrengthening ? 'rgba(129, 201, 149, 0.1)' : 'rgba(242, 139, 130, 0.1)';
+        
+        chart.update('none'); // Update tanpa animasi berlebih agar terasa snappier
+    }
+</script>
+
+</body>
+</html>
